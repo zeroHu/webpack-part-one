@@ -22,15 +22,34 @@ module.exports = {
         }]
     },
     plugins: [
-        new HtmlWebpackPlugin({
-            template: __dirname + "/index.tmpl.html"
-        }),
         new webpack.HotModuleReplacementPlugin(),
     ],
     devServer: {
-        // color: true,
         historyApiFallback: true,
-        // inline: false,
         hot: true
     }
+}
+if (process.env.NODE_ENV === 'production') {
+    module.exports.devtool = '#source-map'
+    module.exports.plugins = (module.exports.plugins || []).concat([
+        new webpack.DefinePlugin({
+            'process.env': {
+                NODE_ENV: '"production"'
+            }
+        }),
+        new HtmlWebpackPlugin({
+            inject: 'body',
+            template: __dirname + "/index.tmpl.html",
+            filename: 'index.html'
+        }),
+        new webpack.optimize.UglifyJsPlugin({
+            sourceMap: true,
+            compress: {
+                warnings: false
+            }
+        }),
+        new webpack.LoaderOptionsPlugin({
+            minimize: true
+        })
+    ])
 }
